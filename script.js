@@ -207,11 +207,14 @@ const separateAndSortAndProcessBalances = (balances) => {
         }
         // If the balance is zero, we do not need to include it as they are even
     }
+    console.log(receiverBalances)
+    console.log(giverBalances)
     // Sort giver balances from largest to smallest
     let sortedGivers = Object.entries(giverBalances).sort((a, b) => b[1] - a[1]);
     // Sort receiver balances from smallest to largest (more negative to less negative)
     let sortedReceivers = Object.entries(receiverBalances).sort((a, b) => a[1] - b[1]);
-    
+    console.log("sorted receiver balance: " + sortedReceivers)
+    console.log("sorted giver balance: " + sortedGivers)
     processTransactions(sortedGivers, sortedReceivers)
 }
 /** 
@@ -228,6 +231,8 @@ const processTransactions = (sortedGivers, sortedReceivers) => {
             // If the giver amount is smaller than or equal to the receiver amount
             // Add the transaction
             addTransaction(currentGiver[0], currentReceiver[0], Math.abs(currentGiver[1]));
+            //update receiver balance
+            sortedReceivers[0][1] += sortedGivers[0][1];
             // Remove the giver from the giverBalances
             sortedGivers.shift();
         } else {
@@ -235,7 +240,7 @@ const processTransactions = (sortedGivers, sortedReceivers) => {
             // Add the transaction
             addTransaction(currentGiver[0], currentReceiver[0], Math.abs(currentReceiver[1]));
             // Update the giver's balance
-            currentGiver[1] += currentReceiver[1];
+            sortedGivers[0][1] += sortedReceivers[0][1];
             // Remove the receiver from the receiverBalances
             sortedReceivers.shift();
         }
@@ -249,7 +254,10 @@ function addTransaction(giver, receiver, amount) {
     if (!finalTransactions[giver]) {
         finalTransactions[giver] = {};
     }
-    finalTransactions[giver][receiver] = amount;
+    if (!finalTransactions[giver][receiver]) {
+        finalTransactions[giver][receiver] = 0
+    }
+    finalTransactions[giver][receiver] += amount;
 }
 
 //------result functions
